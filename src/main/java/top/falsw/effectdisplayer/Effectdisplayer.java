@@ -44,6 +44,7 @@ public class Effectdisplayer implements ModInitializer {
             // 设置插值， 单位为 tick
             displayEntity.setStartInterpolation(0);
             displayEntity.setInterpolationDuration(100);
+            // 奇怪，有时插值不会生效，物块会直接变为变换后的样子
             server.execute(() -> {
                 // 添加到世界
                 world.spawnEntity(displayEntity);
