@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "effectdisplayer",
+  "version": "${version}",
+  "name": "EffectDisplayer",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/effectdisplayer/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "top.falsw.effectdisplayer.client.EffectdisplayerClient"
+    ],
+    "main": [
+      "top.falsw.effectdisplayer.Effectdisplayer"
+    ]
+  },
+  "mixins": [
+    "effectdisplayer.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
