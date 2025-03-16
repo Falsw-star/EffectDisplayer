@@ -42,11 +42,8 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
     }
 
     public void setInterpolation(int startInterpolation, int interpolationDuration) {
-        NbtCompound nbt = new NbtCompound();
-        this.writeNbt(nbt);
-        nbt.putInt("start_interpolation", startInterpolation);
-        nbt.putInt("interpolation_duration", interpolationDuration);
-        nbtList.add(nbt);
+        this.startInterpolation = startInterpolation;
+        this.interpolationDuration = interpolationDuration;
     }
 
     public ModItemDisplayEntity setMaxAge(int maxAge) {
