@@ -14,6 +14,9 @@ import net.minecraft.world.World;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+
 public class Effectdisplayer implements ModInitializer {
 
     public static Logger LOGGER = org.slf4j.LoggerFactory.getLogger("Effectdisplayer");
@@ -40,8 +43,15 @@ public class Effectdisplayer implements ModInitializer {
                     pos,
                     player.getMainHandStack()
             ).setMaxAge(200).spawn();
-
-            displayEntity.translation(new Vector3f(0.0f, 20.0f, 0.0f)).scale(new Vector3f(0.5f, 0.5f, 0.5f)).addTransformation();
+            displayEntity.setAnimation(new Animation(displayEntity, false)
+                    .at(0)
+                    .addMovement((entity, animation) -> entity.translation(new Vector3f(0, 10, 0)).addTransformation()).next()
+                    .addMovement((entity, animation) -> entity.translation(new Vector3f(10, 0, 0)).addTransformation()).next()
+                    .addMovement((entity, animation) -> entity.translation(new Vector3f(0, 0, 10)).addTransformation()).next()
+                    .addMovement((entity, animation) -> entity.translation(new Vector3f(-10, 0, 0)).addTransformation()).next()
+                    .addMovement((entity, animation) -> entity.translation(new Vector3f(0, -10, 0)).addTransformation()).next()
+                    .addMovement((entity, animation) -> entity.translation(new Vector3f(0, 0, -10)).addTransformation()).next()
+            );
 
             source.sendFeedback(() -> Text.literal(
                     "生成于 " + pos

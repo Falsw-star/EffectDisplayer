@@ -15,6 +15,7 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.LinkedList;
+import java.util.function.BiConsumer;
 
 public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
 
@@ -23,11 +24,12 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
     private int maxAge;
     private boolean maxAgeSet = false;
     private LinkedList<NbtCompound> nbtList = new LinkedList<>();
-    private int startInterpolation = 0;
-    private int interpolationDuration = 20;
+    public int startInterpolation = 0;
+    public int interpolationDuration = 20;
     private AffineTransformation other_transformation = new AffineTransformation(
             new Vector3f(), new Quaternionf(), new Vector3f(), new Quaternionf()
     );
+    private Animation animation = null;
 
     public ModItemDisplayEntity spawn() {
         this.getWorld().spawnEntity(this);
@@ -41,9 +43,18 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         this.maxAge = this.age;
     }
 
+    public void setAnimation(Animation animation) {
+        this.animation = animation;
+        if (animation.autoMaxAge) { this.setMaxAge(this.animation.length); }
+    }
+
     public void setInterpolation(int startInterpolation, int interpolationDuration) {
         this.startInterpolation = startInterpolation;
         this.interpolationDuration = interpolationDuration;
+        if (this.animation != null) {
+            this.animation.startInterpolation = this.startInterpolation;
+            this.animation.interpolationDuration = this.interpolationDuration;
+        }
     }
 
     public ModItemDisplayEntity setMaxAge(int maxAge) {
@@ -57,6 +68,16 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         super.tick();
         if (this.maxAgeSet && this.age >= this.maxAge) {
             this.remove(RemovalReason.KILLED);
+        }
+        if (this.animation != null) {
+            for (int i = 0; i < this.animation.movements.size(); i++) {
+                Movement<Integer, BiConsumer<ModItemDisplayEntity, Animation>> movement = this.animation.movements.get(i);
+                if (this.age >= movement.a) {
+                    movement.b.accept(this, this.animation);
+                    this.animation.movements.remove(i);
+                    i--;
+                }
+            }
         }
         if (!nbtList.isEmpty()) {
             this.readNbt(nbtList.removeFirst());
