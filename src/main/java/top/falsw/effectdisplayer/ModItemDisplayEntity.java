@@ -15,13 +15,13 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.LinkedList;
-import java.util.function.BiConsumer;
 
 public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
 
     static final Logger LOGGER = LogUtils.getLogger();
 
     private int maxAge;
+    public int at = 0;
     private boolean maxAgeSet = false;
     private LinkedList<NbtCompound> nbtList = new LinkedList<>();
     public int startInterpolation = 0;
@@ -43,18 +43,19 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         this.maxAge = this.age;
     }
 
-    public void setAnimation(Animation animation) {
+    public ModItemDisplayEntity at(int startAge) {
+        this.at = startAge;
+        return this;
+    }
+
+    public ModItemDisplayEntity setAnimation(Animation animation) {
         this.animation = animation;
-        if (animation.autoMaxAge) { this.setMaxAge(this.animation.length); }
+        return this;
     }
 
     public void setInterpolation(int startInterpolation, int interpolationDuration) {
         this.startInterpolation = startInterpolation;
         this.interpolationDuration = interpolationDuration;
-        if (this.animation != null) {
-            this.animation.startInterpolation = this.startInterpolation;
-            this.animation.interpolationDuration = this.interpolationDuration;
-        }
     }
 
     public ModItemDisplayEntity setMaxAge(int maxAge) {
@@ -71,11 +72,19 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         }
         if (this.animation != null) {
             for (int i = 0; i < this.animation.movements.size(); i++) {
-                Movement<Integer, BiConsumer<ModItemDisplayEntity, Animation>> movement = this.animation.movements.get(i);
-                if (this.age >= movement.a) {
-                    movement.b.accept(this, this.animation);
+                Movement movement = this.animation.movements.get(i);
+                if (this.age >= movement.age + this.at) {
+                    this.animation.runMovement(movement, this);
                     this.animation.movements.remove(i);
                     i--;
+                }
+                if (this.animation.movements.isEmpty()) {
+                    this.animation.repeat -= 1;
+                    if (this.animation.repeat > 0) {
+                        this.at = this.age + this.interpolationDuration;
+                        this.animation.movements.addAll(this.animation.trash);
+                        this.animation.trash.clear();
+                    }
                 }
             }
         }
