@@ -64,8 +64,8 @@ public class Animation {
      * in this case, you can use this method to add the custom duration.
      * For instance, now the 'interpolationDuration' is 100, you can separate the movement into two parts:
      * .addMovement((ent, ani) -> ent.setGlowing(true)).next(50).addMovement((ent, ani) -> ent.setGlowing(false)).next(50)
-     * @param customInterpolationDuration
-     * @return
+     * @param customInterpolationDuration The custom duration.
+     * @return This.
      */
     public Animation next(int customInterpolationDuration) {
         this.at += customInterpolationDuration;
