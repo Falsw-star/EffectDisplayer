@@ -16,7 +16,15 @@ import org.slf4j.Logger;
 
 import java.util.LinkedList;
 
-public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
+/**
+ * EffectDisplayEntity
+ * This entity is the core of the project.
+ * While spawn() is called, the entity will be spawned.
+ * Before that you should set all the things you need.
+ * The parent class DisplayEntity.ItemDisplayEntity was added by mojang in 1.19.
+ * @author Falsw
+ */
+public class EffectDisplayEntity extends DisplayEntity.ItemDisplayEntity {
 
     static final Logger LOGGER = LogUtils.getLogger();
 
@@ -31,34 +39,57 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
     );
     private Animation animation = null;
 
-    public ModItemDisplayEntity spawn() {
+    /**
+     * Spawn the entity.
+     * @return This.
+     */
+    public EffectDisplayEntity spawn() {
         this.getWorld().spawnEntity(this);
         return this;
     }
 
-    public ModItemDisplayEntity(World world, Vec3d pos, ItemStack itemStack) {
+    public EffectDisplayEntity(World world, Vec3d pos, ItemStack itemStack) {
         super(EntityType.ITEM_DISPLAY, world);
         super.setPosition(pos);
         super.setItemStack(itemStack);
         this.maxAge = this.age;
     }
 
-    public ModItemDisplayEntity at(int startAge) {
+    /**
+     * @param startAge the animation will start at this age.
+     * @return This.
+     */
+    public EffectDisplayEntity at(int startAge) {
         this.at = startAge;
         return this;
     }
 
-    public ModItemDisplayEntity setAnimation(Animation animation) {
+    /**
+     * @param animation Animation.
+     * @return This.
+     */
+    public EffectDisplayEntity setAnimation(Animation animation) {
         this.animation = animation;
         return this;
     }
 
-    public void setInterpolation(int startInterpolation, int interpolationDuration) {
+    /**
+     * @param startInterpolation Each transformation will delay for this amount of ticks after nbt is set by setTransformation().
+     * @param interpolationDuration Each transformation will last for this amount of ticks.
+     * @return This.
+     */
+    public EffectDisplayEntity setInterpolation(int startInterpolation, int interpolationDuration) {
         this.startInterpolation = startInterpolation;
         this.interpolationDuration = interpolationDuration;
+        return this;
     }
 
-    public ModItemDisplayEntity setMaxAge(int maxAge) {
+    /**
+     * If set, the entity will be removed at this age.
+     * @param maxAge the max age.
+     * @return This.
+     */
+    public EffectDisplayEntity setMaxAge(int maxAge) {
         this.maxAgeSet = true;
         this.maxAge = this.age + maxAge;
         return this;
@@ -93,6 +124,11 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         }
     }
 
+    /**
+     * Set the nbt of the transformation of the entity.
+     * @param other transformation.
+     * @param add if true, the transformation will be added to the current transformation; if false, the transformation will replace the current transformation.
+     */
     public void setTransformation(AffineTransformation other, boolean add) {
         NbtCompound nbt = new NbtCompound();
         this.writeNbt(nbt);
@@ -100,7 +136,7 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         nbt.putInt("interpolation_duration", interpolationDuration);
         if (!nbt.contains("transformation")) {
             AffineTransformation.ANY_CODEC
-                    .encodeStart(NbtOps.INSTANCE, AffineTransformation.identity())
+                    .encodeStart(NbtOps.INSTANCE, new AffineTransformation(new Vector3f(), new Quaternionf(), new Vector3f(), new Quaternionf()))
                     .ifSuccess(nbtCompound -> nbt.put("transformation", nbtCompound));
         } else {
             AffineTransformation.CODEC
@@ -126,7 +162,12 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         nbtList.add(nbt);
     }
 
-    public ModItemDisplayEntity translation(Vector3f vector3f) {
+    /**
+     * Set the translation of the 'other' transformation of the entity.
+     * @param vector3f translation.
+     * @return This.
+     */
+    public EffectDisplayEntity translation(Vector3f vector3f) {
         other_transformation = new AffineTransformation(
                 vector3f,
                 other_transformation.getLeftRotation(),
@@ -136,7 +177,17 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         return this;
     }
 
-    public ModItemDisplayEntity rotation(Quaternionf leftRotation, Quaternionf rightRotation) {
+    public EffectDisplayEntity translation(float x, float y, float z) {
+        return translation(new Vector3f(x, y, z));
+    }
+
+    /**
+     * Set the rotation of the 'other' transformation of the entity.
+     * @param leftRotation leftRotation
+     * @param rightRotation rightRotation
+     * @return This.
+     */
+    public EffectDisplayEntity rotation(Quaternionf leftRotation, Quaternionf rightRotation) {
         other_transformation = new AffineTransformation(
                 other_transformation.getTranslation(),
                 leftRotation != null ? leftRotation : other_transformation.getLeftRotation(),
@@ -146,16 +197,29 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         return this;
     }
 
-    public ModItemDisplayEntity scale(Vector3f scale) {
+    /**
+     * Set the scale of the 'other' transformation of the entity.
+     * @param vector3f scale. Default is 1 (times).
+     * @return This.
+     */
+    public EffectDisplayEntity scale(Vector3f vector3f) {
         other_transformation = new AffineTransformation(
                 other_transformation.getTranslation(),
                 other_transformation.getLeftRotation(),
-                scale,
+                vector3f,
                 other_transformation.getRightRotation()
         );
         return this;
     }
 
+    public EffectDisplayEntity scale(float x, float y, float z) {
+        return scale(new Vector3f(x, y, z));
+    }
+
+    /**
+     * Make the 'other' transformation take the place of the entity's.
+     * The 'other' transformation will be reset.
+     */
     public void setTransformation() {
         setTransformation(other_transformation, false);
         other_transformation = new AffineTransformation(
@@ -163,6 +227,10 @@ public class ModItemDisplayEntity extends DisplayEntity.ItemDisplayEntity {
         );
     }
 
+    /**
+     * Add the 'other' transformation to the entity's.
+     * The 'other' transformation will be reset.
+     */
     public void addTransformation() {
         setTransformation(other_transformation, true);
         other_transformation = new AffineTransformation(

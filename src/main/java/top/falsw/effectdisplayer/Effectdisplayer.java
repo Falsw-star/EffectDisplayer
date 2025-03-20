@@ -11,7 +11,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 public class Effectdisplayer implements ModInitializer {
@@ -32,22 +31,10 @@ public class Effectdisplayer implements ModInitializer {
                 source.sendError(Text.literal("仅玩家可使用此命令"));
                 return 0;
             }
-            Vec3d pos = source.getPosition(); // 使初始位置稍作移动以便观察？
+            Vec3d pos = source.getPosition().add(0, -50, 0); // 使初始位置稍作移动以便观察？
 
             // 新建 ItemDisplayEntity
-            ModItemDisplayEntity displayEntity = new ModItemDisplayEntity(
-                    world,
-                    pos,
-                    player.getMainHandStack()
-            ).spawn();
-            displayEntity.at(0).setAnimation(new Animation(displayEntity)
-                    .at(0)
-                    // animation here
-                    .addMovement((entity, animation) -> entity.translation(new Vector3f(0, 10, 0)).addTransformation()).next()
-                    .addMovement((entity, animation) -> entity.translation(new Vector3f(0, -10, 0)).addTransformation()).next()
-                    .repeat(5)
-                    .autoDelete()
-            );
+            new Effect(pos, world);
 
             source.sendFeedback(() -> Text.literal(
                     "生成于 " + pos
