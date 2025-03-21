@@ -1,4 +1,4 @@
-package top.falsw.effectdisplayer;
+package top.falsw.effectdisplayer.EffectDisplayer;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.entity.EntityType;
@@ -31,7 +31,7 @@ public class EffectDisplayEntity extends DisplayEntity.ItemDisplayEntity {
     private int maxAge;
     public int at = 0;
     private boolean maxAgeSet = false;
-    private LinkedList<NbtCompound> nbtList = new LinkedList<>();
+    private final LinkedList<NbtCompound> nbtList = new LinkedList<>();
     public int startInterpolation = 0;
     public int interpolationDuration = 20;
     private AffineTransformation other_transformation = new AffineTransformation(
@@ -237,15 +237,4 @@ public class EffectDisplayEntity extends DisplayEntity.ItemDisplayEntity {
                 new Vector3f(), new Quaternionf(), new Vector3f(), new Quaternionf()
         );
     }
-
-    // 修复有时候直接设置变化时插值不生效
-    // 错误原因推测为 start_interpolation 被重置为 0 ，Minecraft 执行时该 tick 已经过去
-    // Update：此问题仍未解决
-    // 已知的信息：在游戏内使用 /data merge 不会发生此问题
-
-    // 思路：待实体生成后再修改其nbt
-    // Update：此问题已解决！
-    // Update：此问题仍未解决！
-    // Update：此问题可能已经找到解决方案！
-    // Update：此问题已解决！
 }

@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.slf4j.Logger;
+import top.falsw.effectdisplayer.EffectDisplayer.Effect;
 
 public class Effectdisplayer implements ModInitializer {
 
@@ -34,7 +35,6 @@ public class Effectdisplayer implements ModInitializer {
             Vec3d pos = source.getPosition().add(0, -50, 0); // 使初始位置稍作移动以便观察？
 
             // 新建 ItemDisplayEntity
-            new Effect(pos, world);
 
             source.sendFeedback(() -> Text.literal(
                     "生成于 " + pos

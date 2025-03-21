@@ -1,4 +1,4 @@
-package top.falsw.effectdisplayer;
+package top.falsw.effectdisplayer.EffectDisplayer;
 
 import java.util.LinkedList;
 import java.util.function.BiConsumer;
